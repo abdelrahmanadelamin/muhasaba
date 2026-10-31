@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>محاسبة اليوم</title>
+<meta name="theme-color" content="#1f5c4a">
+<meta name="description" content="متابعة يومية للصلوات والسنن والمذاكرة والرياضة والقرآن">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="محاسبة">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f3f1ea; --card:#fffdf8; --ink:#1d2a26; --muted:#66706b; --line:#ddd8cb;
+  --green:#1f5c4a; --green-soft:#dcebe3; --brass:#a8782a; --brass-soft:#f3e6cc;
+  --l5:#1f5c4a; --l4:#3d8569; --l3:#7aa88f; --l2:#c9a35a; --l1:#c97a5a; --l0:#e5e1d6; --danger:#b04a3a;
+  --f-display:"Reem Kufi","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --f-body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#121816; --card:#1a2220; --ink:#e7ece8; --muted:#97a39d; --line:#2c3633;
+  --green:#6fbf9c; --green-soft:#1f3a31; --brass:#d9aa5c; --brass-soft:#3a2f1c;
+  --l5:#5fb892; --l4:#4a9a78; --l3:#3d7a62; --l2:#a8843f; --l1:#a35f45; --l0:#26302d; --danger:#e07a68; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6;-webkit-tap-highlight-color:transparent;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.7rem;margin:0;color:var(--green)}
+h2{font-family:var(--f-display);font-weight:500;font-size:1.1rem;margin:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.who{font-size:.85rem;color:var(--muted)}
+.tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.tabs button{flex:1;border:0;background:none;font:inherit;font-weight:600;color:var(--muted);padding:9px 4px;border-radius:9px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--green);color:var(--card)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+section{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.datebar{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.datebar button{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;width:40px;height:40px;border-radius:10px;cursor:pointer;font-size:1.1rem}
+.datebar button:disabled{opacity:.35}
+.datebar .d{text-align:center}
+.datebar .d b{display:block;font-family:var(--f-display);font-size:1.1rem}
+.datebar .d span{font-size:.8rem;color:var(--muted)}
+.score{display:flex;align-items:center;gap:14px}
+.ring{width:84px;height:84px;flex:none}
+.score .big{font-family:var(--f-display);font-size:2rem;line-height:1;font-variant-numeric:tabular-nums}
+.score .lbl{color:var(--muted);font-size:.85rem}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sec-h small{color:var(--muted);font-variant-numeric:tabular-nums}
+.prayer{display:grid;grid-template-columns:4.2rem 1fr;align-items:center;gap:8px}
+.prayer .n{font-weight:600}
+.lv{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.lv button{border:1px solid var(--line);background:var(--bg);color:var(--muted);font:inherit;font-size:.72rem;line-height:1.2;padding:6px 2px;border-radius:8px;cursor:pointer;min-height:44px}
+.lv button b{display:block;font-size:.95rem;font-variant-numeric:tabular-nums}
+.lv button.on{color:#fff;border-color:transparent}
+.legend{font-size:.78rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 12px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.chk{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;background:var(--bg);font-weight:500;user-select:none}
+.chk input{accent-color:var(--green);width:18px;height:18px;margin:0}
+.chk.on{background:var(--green-soft);border-color:var(--green)}
+.num{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:1.2rem;cursor:pointer}
+.stepper input{width:64px;text-align:center;font:inherit;font-weight:700;font-variant-numeric:tabular-nums;border:1px solid var(--line);border-radius:10px;height:40px;background:var(--card);color:var(--ink)}
+.bar{height:6px;background:var(--l0);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:6px;transition:width .25s}
+.sub{font-size:.8rem;color:var(--muted)}
+p.sub{margin:0}
+.status{font-size:.8rem;color:var(--muted);text-align:center;min-height:1.2em}
+.grid-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.82rem;font-variant-numeric:tabular-nums}
+th,td{border:1px solid var(--line);padding:6px 4px;text-align:center}
+th{background:var(--bg);font-weight:600}
+td.k{text-align:right;font-weight:600;white-space:nowrap;padding-inline:8px}
+td.tot{font-weight:700;color:var(--green)}
+.cell{display:inline-block;min-width:22px;padding:1px 4px;border-radius:5px;color:#fff;font-weight:600}
+.btn{border:0;background:var(--green);color:var(--card);font:inherit;font-weight:600;padding:10px 14px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+.btn.danger{background:none;border:1px solid var(--line);color:var(--danger)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.member{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding-block:8px;border-bottom:1px solid var(--line)}
+.member:last-child{border-bottom:0}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;background:var(--brass)}
+.member .m-n{font-weight:600}
+.spark{display:flex;gap:3px;margin-top:4px}
+.spark i{width:14px;height:14px;border-radius:4px;background:var(--l0)}
+.member .s{font-family:var(--f-display);font-size:1.3rem;font-variant-numeric:tabular-nums;color:var(--green)}
+.field{display:flex;gap:8px;align-items:center}
+.field input{flex:1;min-width:0;font:inherit;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:var(--card);color:var(--ink)}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:1.4rem;letter-spacing:.18em;font-weight:700;direction:ltr;text-align:center;background:var(--brass-soft);border-radius:10px;padding:8px;user-select:all}
+.install{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--green-soft);border:1px solid var(--green);border-radius:12px;padding:10px 12px;font-size:.88rem}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>محاسبة اليوم</h1>
+    <div class="who" id="who">محفوظ على الموبايل</div>
+  </div>
+
+  <div class="install" id="installBar" hidden>
+    <span id="installText">ثبّت التطبيق على الشاشة الرئيسية</span>
+    <button class="btn" id="installBtn">تثبيت</button>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-v="day">اليوم</button>
+    <button role="tab" aria-selected="false" data-v="week">الأسبوع</button>
+    <button role="tab" aria-selected="false" data-v="fam">العائلة</button>
+  </div>
+
+  <!-- DAY -->
+  <section id="v-day">
+    <div class="card">
+      <div class="datebar">
+        <button id="prev" aria-label="اليوم السابق">›</button>
+        <div class="d"><b id="dName"></b><span id="dDate"></span></div>
+        <button id="next" aria-label="اليوم التالي">‹</button>
+      </div>
+      <div class="score">
+        <svg class="ring" viewBox="0 0 84 84" aria-hidden="true">
+          <circle cx="42" cy="42" r="36" fill="none" stroke="var(--l0)" stroke-width="9"/>
+          <circle id="ringArc" cx="42" cy="42" r="36" fill="none" stroke="var(--green)" stroke-width="9" stroke-linecap="round" transform="rotate(-90 42 42)" stroke-dasharray="226.2" stroke-dashoffset="226.2"/>
+        </svg>
+        <div>
+          <div class="big"><span id="total">0</span><span style="font-size:1rem;color:var(--muted)"> / 100</span></div>
+          <div class="lbl" id="verdict">ابدأ يومك</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sec-h"><h2>١. الصلوات الخمس</h2><small id="pSum">0 / 25</small></div>
+      <div id="prayers" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div class="legend"><span>٥ تكبيرة الإحرام في المسجد</span><span>٤ في المسجد</span><span>٣ جماعة</span><span>٢ في وقتها</span><span>١ متأخرة</span></div>
+    </div>
+
+    <div class="card">
+      <div class="sec-h"><h2>٢. السنن الرواتب والضحى والوتر</h2><small id="sSum">0 / 3</small></div>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" id="s-r"> الرواتب</label>
+        <label class="chk"><input type="checkbox" id="s-d"> الضحى</label>
+        <label class="chk"><input type="checkbox" id="s-w"> الوتر</label>
+      </div>
+    </div>
+
+    <div class="card" id="nums"></div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <!-- WEEK -->
+  <section id="v-week" hidden>
+    <div class="card">
+      <div class="datebar">
+        <button id="wprev" aria-label="الأسبوع السابق">›</button>
+        <div class="d"><b>الأسبوع</b><span id="wRange"></span></div>
+        <button id="wnext" aria-label="الأسبوع التالي">‹</button>
+      </div>
+      <div class="grid-scroll"><table id="wTable"></table></div>
+      <div class="sub" id="wAvg"></div>
+    </div>
+    <div class="card">
+      <h2>شارك وطبع</h2>
+      <div class="row">
+        <button class="btn" id="shareWeek">ابعت ملخص الأسبوع</button>
+        <button class="btn ghost" id="printFilled">اطبع الأسبوع</button>
+        <button class="btn ghost" id="printBlank">اطبع شيت فاضي</button>
+      </div>
+      <p class="sub">الملخص بيتبعت كرسالة على واتساب أو أي تطبيق. الطباعة على ورقة A4 بالعرض.</p>
+      <div class="status" id="shareStatus"></div>
+    </div>
+  </section>
+
+  <!-- FAMILY -->
+  <section id="v-fam" hidden>
+    <div class="card">
+      <h2>اسمك</h2>
+      <div class="field"><input id="nick" maxlength="30" placeholder="مثلاً: أحمد" autocomplete="nickname"><button class="btn" id="saveNick">حفظ</button></div>
+    </div>
+
+    <!-- Firebase not configured -->
+    <div class="card" id="famOff" hidden>
+      <h2>المتابعة المباشرة مش مفعّلة</h2>
+      <p class="sub">التسجيل محفوظ على الموبايل ده. علشان تتابع أولادك، كل واحد يبعتلك ملخص الأسبوع من تبويب "الأسبوع". ولو عايز تشوفهم لايف، فعّل Firebase بالخطوات اللي في ملف README.</p>
+    </div>
+
+    <!-- Configured, not joined -->
+    <div class="card" id="famJoin" hidden>
+      <h2>انضم لعيلتك</h2>
+      <p class="sub">ولي الأمر يعمل عيلة جديدة ويبعت الكود للأولاد. كل ولد يكتب الكود هنا من موبايله.</p>
+      <button class="btn" id="createFam">إنشاء عيلة جديدة</button>
+      <div class="field"><input id="joinCode" maxlength="9" placeholder="كود العيلة" dir="ltr" autocapitalize="characters" autocomplete="off"><button class="btn ghost" id="joinFam">انضمام</button></div>
+      <div class="status" id="joinStatus"></div>
+    </div>
+
+    <!-- Joined -->
+    <div class="card" id="famOn" hidden>
+      <div class="sec-h"><h2>متابعة العيلة</h2><small id="famCount"></small></div>
+      <div id="famList"></div>
+    </div>
+    <div class="card" id="famCodeCard" hidden>
+      <h2>كود العيلة</h2>
+      <div class="code" id="famCode"></div>
+      <div class="row">
+        <button class="btn" id="shareCode">ابعت الكود</button>
+        <button class="btn danger" id="leaveFam">خروج من العيلة</button>
+      </div>
+      <div class="row" id="leaveConfirm" hidden>
+        <span class="sub" style="flex:1">تسجيلك هيفضل على الموبايل بس هيختفي من قائمة العيلة. متأكد؟</span>
+        <button class="btn danger" id="leaveYes">أيوه، اخرج</button>
+        <button class="btn ghost" id="leaveNo">لا</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<iframe id="printFrame" title="طباعة" style="position:fixed;width:0;height:0;border:0;left:-9999px"></iframe>
+
+<script>
+(function(){
+"use strict";
+const PR=["الفجر","الظهر","العصر","المغرب","العشاء"];
+const LV=[{v:5,t:"تكبيرة"},{v:4,t:"مسجد"},{v:3,t:"جماعة"},{v:2,t:"وقتها"},{v:1,t:"متأخر"}];
+const NUMS=[
+  {k:"study",t:"٣. مذاكرة",short:"مذاكرة",unit:"ساعة",goal:3,step:.5,max:12,w:15},
+  {k:"sport",t:"٤. رياضة",short:"رياضة",unit:"دقيقة",goal:20,step:5,max:180,w:10},
+  {k:"wird",t:"٥. ورد القرآن",short:"ورد",unit:"صفحة",goal:15,step:1,max:604,w:10},
+  {k:"rev",t:"٦. مراجعة وحفظ",short:"مراجعة وحفظ",unit:"دقيقة",goal:30,step:5,max:240,w:10}
+];
+const DAYS=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+const MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+const $=id=>document.getElementById(id);
+const lvColor=v=>`var(--l${v||0})`;
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const startOfWeek=d=>addDays(d,-((d.getDay()+1)%7)); // week starts Saturday
+const blank=()=>({p:[0,0,0,0,0],r:0,d:0,w:0,study:0,sport:0,wird:0,rev:0});
+
+function score(e){
+  if(!e) return 0;
+  const p=(e.p||[]).reduce((a,b)=>a+(+b||0),0)/25*40;
+  const s=((e.r?1:0)+(e.d?1:0)+(e.w?1:0))*5;
+  let n=0; NUMS.forEach(x=>{n+=Math.min((+e[x.k]||0)/x.goal,1)*x.w});
+  return Math.round(p+s+n);
+}
+const hasAny=e=>!!e&&score(e)>0;
+
+/* ---------- local storage ---------- */
+let state={nick:"",days:{}};
+function loadLocal(){try{const s=JSON.parse(localStorage.getItem("muhasaba")||"null");if(s&&s.days)state=s}catch(e){}}
+function saveLocal(){try{localStorage.setItem("muhasaba",JSON.stringify(state))}catch(e){}}
+const getFam=()=>{try{return localStorage.getItem("muhasaba_fam")||""}catch(e){return ""}};
+const setFam=c=>{try{c?localStorage.setItem("muhasaba_fam",c):localStorage.removeItem("muhasaba_fam")}catch(e){}};
+
+let cur=today(), weekStart=startOfWeek(today());
+
+/* ---------- day view ---------- */
+function entry(){const k=key(cur);if(!state.days[k])state.days[k]=blank();return state.days[k]}
+function renderPrayers(){
+  const e=entry();const box=$("prayers");box.innerHTML="";
+  PR.forEach((n,i)=>{
+    const row=document.createElement("div");row.className="prayer";
+    row.innerHTML=`<div class="n">${n}</div><div class="lv" role="group" aria-label="${n}"></div>`;
+    const g=row.querySelector(".lv");
+    LV.forEach(l=>{
+      const b=document.createElement("button");b.type="button";
+      const on=e.p[i]===l.v;if(on){b.className="on";b.style.background=lvColor(l.v)}
+      b.setAttribute("aria-pressed",on);
+      b.innerHTML=`<b>${l.v}</b>${l.t}`;
+      b.onclick=()=>{e.p[i]=e.p[i]===l.v?0:l.v;changed();};
+      g.appendChild(b);
+    });
+    box.appendChild(row);
+  });
+}
+function renderNums(){
+  const e=entry();const box=$("nums");box.innerHTML="";
+  NUMS.forEach(x=>{
+    const v=+e[x.k]||0;
+    const d=document.createElement("div");d.style.cssText="display:flex;flex-direction:column;gap:6px";
+    d.innerHTML=`<div class="num"><div><h2>${x.t}</h2><div class="sub">الهدف ${x.goal} ${x.unit}</div></div>
+      <div class="stepper"><button type="button" aria-label="زيادة">+</button><input id="n-${x.k}" inputmode="decimal" value="${v}" aria-label="${x.short} بال${x.unit}"><button type="button" aria-label="نقص">−</button></div></div>
+      <div class="bar"><i style="width:${Math.min(v/x.goal,1)*100}%"></i></div>`;
+    const [plus,minus]=d.querySelectorAll(".stepper button");const inp=d.querySelector("input");
+    const set=n=>{n=Math.max(0,Math.min(x.max,Math.round(n*2)/2));e[x.k]=n;changed();};
+    plus.onclick=()=>set(v+x.step);minus.onclick=()=>set(v-x.step);
+    inp.onchange=()=>set(parseFloat(inp.value.replace(/[٠-٩]/g,c=>"٠١٢٣٤٥٦٧٨٩".indexOf(c)).replace("٫","."))||0);
+    box.appendChild(d);
+  });
+}
+function renderDay(){
+  const e=entry();
+  $("dName").textContent=key(cur)===key(today())?"النهارده":DAYS[cur.getDay()];
+  $("dDate").textContent=`${DAYS[cur.getDay()]} ${cur.getDate()} ${MONTHS[cur.getMonth()]}`;
+  $("next").disabled=key(cur)>=key(today());
+  renderPrayers();renderNums();
+  ["r","d","w"].forEach(k=>{const c=$("s-"+k);c.checked=!!e[k];c.parentElement.classList.toggle("on",!!e[k])});
+  const t=score(e);$("total").textContent=t;
+  $("ringArc").setAttribute("stroke-dashoffset",(226.2*(1-t/100)).toFixed(1));
+  $("pSum").textContent=`${e.p.reduce((a,b)=>a+b,0)} / 25`;
+  $("sSum").textContent=`${(e.r?1:0)+(e.d?1:0)+(e.w?1:0)} / 3`;
+  $("verdict").textContent=t>=90?"ما شاء الله، يوم ممتاز":t>=70?"يوم طيب، كمّل":t>=40?"فيه تقصير، تدارك الباقي":t>0?"لسه بدري، قوم":"ابدأ يومك";
+}
+["r","d","w"].forEach(k=>{$("s-"+k).onchange=ev=>{entry()[k]=ev.target.checked?1:0;changed();}});
+$("prev").onclick=()=>{cur=addDays(cur,-1);renderDay()};
+$("next").onclick=()=>{if(key(cur)<key(today())){cur=addDays(cur,1);renderDay()}};
+
+/* ---------- week view ---------- */
+function weekRows(days){
+  const ks=[...Array(7)].map((_,i)=>key(addDays(weekStart,i)));
+  const g=k=>days[k];
+  const rows=[];
+  PR.forEach((n,i)=>rows.push({t:n,c:ks.map(k=>{const v=g(k)?.p?.[i]||0;return{v,html:v?`<span class="cell" style="background:${lvColor(v)}">${v}</span>`:"–"}})}));
+  [["الرواتب","r"],["الضحى","d"],["الوتر","w"]].forEach(([t,f])=>rows.push({t,c:ks.map(k=>({v:g(k)?.[f]?"✓":0,html:g(k)?.[f]?"✓":"–"}))}));
+  NUMS.forEach(x=>rows.push({t:`${x.short} (${x.unit})`,c:ks.map(k=>{const v=+g(k)?.[x.k]||0;return{v,html:v?String(v):"–"}})}));
+  rows.push({t:"المجموع /100",tot:true,c:ks.map(k=>({v:hasAny(g(k))?score(g(k)):0,html:hasAny(g(k))?String(score(g(k))):"–"}))});
+  return {ks,rows};
+}
+const rangeText=()=>{const end=addDays(weekStart,6);return `${weekStart.getDate()} ${MONTHS[weekStart.getMonth()]} – ${end.getDate()} ${MONTHS[end.getMonth()]}`};
+function renderWeek(){
+  const {ks,rows}=weekRows(state.days);
+  $("wRange").textContent=rangeText();
+  $("wnext").disabled=key(addDays(weekStart,6))>=key(today());
+  let h="<tr><th></th>"+ks.map((k,i)=>`<th>${DAYS[addDays(weekStart,i).getDay()]}<br><span style="font-weight:400;color:var(--muted)">${addDays(weekStart,i).getDate()}</span></th>`).join("")+"</tr>";
+  rows.forEach(r=>{h+=`<tr><td class="k">${r.t}</td>`+r.c.map(c=>`<td${r.tot?' class="tot"':""}>${c.html}</td>`).join("")+"</tr>"});
+  $("wTable").innerHTML=h;
+  const logged=ks.filter(k=>hasAny(state.days[k]));
+  $("wAvg").textContent=logged.length?`متوسط الأيام المسجّلة: ${Math.round(logged.reduce((a,k)=>a+score(state.days[k]),0)/logged.length)} من 100 (${logged.length} من 7 أيام)`:"مفيش أيام مسجّلة في الأسبوع ده.";
+}
+$("wprev").onclick=()=>{weekStart=addDays(weekStart,-7);renderWeek()};
+$("wnext").onclick=()=>{weekStart=addDays(weekStart,7);renderWeek()};
+
+function weekSummary(){
+  const ks=[...Array(7)].map((_,i)=>key(addDays(weekStart,i)));
+  const logged=ks.filter(k=>hasAny(state.days[k]));
+  const L=[`📋 محاسبة الأسبوع${state.nick?" – "+state.nick:""}`,`🗓 ${rangeText()}`,""];
+  if(!logged.length){L.push("مفيش أيام مسجّلة.");return L.join("\n")}
+  ks.forEach((k,i)=>{const e=state.days[k];if(hasAny(e))L.push(`${DAYS[addDays(weekStart,i).getDay()]}: ${score(e)}/100`)});
+  const sum=f=>logged.reduce((a,k)=>a+f(state.days[k]),0);
+  L.push("",`المتوسط: ${Math.round(sum(score)/logged.length)}/100 (${logged.length} أيام)`);
+  L.push(`🕌 نقاط الصلاة: ${sum(e=>e.p.reduce((a,b)=>a+b,0))} من ${logged.length*25}`);
+  L.push(`✨ السنن: ${sum(e=>(e.r?1:0)+(e.d?1:0)+(e.w?1:0))} من ${logged.length*3}`);
+  L.push(`📚 مذاكرة: ${sum(e=>+e.study||0)} ساعة`);
+  L.push(`🏃 رياضة: ${sum(e=>+e.sport||0)} دقيقة`);
+  L.push(`📖 ورد: ${sum(e=>+e.wird||0)} صفحة`);
+  L.push(`🧠 مراجعة وحفظ: ${sum(e=>+e.rev||0)} دقيقة`);
+  return L.join("\n");
+}
+$("shareWeek").onclick=async()=>{
+  const text=weekSummary();$("shareStatus").textContent="";
+  if(navigator.share){try{await navigator.share({text});return}catch(e){if(e.name==="AbortError")return}}
+  location.href="https://wa.me/?text="+encodeURIComponent(text);
+};
+
+function printableSheet(filled){
+  const {ks,rows}=weekRows(filled?state.days:{});
+  const head=ks.map((k,i)=>{const d=addDays(weekStart,i);return `<th>${DAYS[d.getDay()]}<br><small>${filled?d.getDate()+" "+MONTHS[d.getMonth()]:"…/…"}</small></th>`}).join("");
+  const body=rows.map(r=>`<tr${r.tot?' class="tot"':""}><td class="k">${r.t}</td>${r.c.map(c=>`<td>${filled&&c.v?c.v:""}</td>`).join("")}</tr>`).join("");
+  return `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>محاسبة الأسبوع</title><style>
+@page{size:A4 landscape;margin:12mm}body{font-family:Tahoma,Arial,sans-serif;color:#1d2a26;margin:0}
+h1{font-size:20pt;margin:0 0 4pt;color:#1f5c4a}.meta{display:flex;justify-content:space-between;font-size:11pt;margin-bottom:8pt}
+table{border-collapse:collapse;width:100%;font-size:11pt}th,td{border:1px solid #888;height:26pt;text-align:center}
+th{background:#eef3f0}td.k{text-align:right;padding:0 8pt;font-weight:bold;width:24%}tr.tot td{background:#f6efe0;font-weight:bold}
+.legend{font-size:9.5pt;margin-top:8pt;color:#444}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}</style></head><body>
+<h1>محاسبة الأسبوع</h1><div class="meta"><span>الاسم: ${state.nick?esc(state.nick):"................................"}</span><span>الأسبوع: ${filled?rangeText():"........................"}</span></div>
+<table><tr><th></th>${head}</tr>${body}</table>
+<div class="legend">الصلاة: ٥ تكبيرة الإحرام في المسجد · ٤ في المسجد · ٣ في جماعة · ٢ في وقتها · ١ متأخرة &nbsp;|&nbsp; الأهداف: مذاكرة ٣ ساعات · رياضة ٢٠ دقيقة · ورد ١٥ صفحة · مراجعة وحفظ ٣٠ دقيقة &nbsp;|&nbsp; المجموع من ١٠٠: الصلوات ٤٠ · السنن ١٥ · المذاكرة ١٥ · الرياضة ١٠ · الورد ١٠ · المراجعة ١٠</div>
+</body></html>`;
+}
+function printSheet(filled){
+  const f=$("printFrame");
+  f.onload=()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){$("shareStatus").textContent="الطباعة مش متاحة هنا، افتح التطبيق من المتصفح."}f.onload=null};
+  f.srcdoc=printableSheet(filled);
+}
+$("printFilled").onclick=()=>printSheet(true);
+$("printBlank").onclick=()=>printSheet(false);
+
+/* ---------- family (Firebase) ---------- */
+const FB=window.FIREBASE_CONFIG;
+let fs=null, uid=null, famCode=getFam(), unsub=null, family=[];
+const ALPHA="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const newCode=()=>{const a=new Uint32Array(8);crypto.getRandomValues(a);const s=[...a].map(n=>ALPHA[n%ALPHA.length]).join("");return s.slice(0,4)+"-"+s.slice(4)};
+const normCode=s=>{const c=String(s||"").toUpperCase().replace(/[^A-Z0-9]/g,"");return c.length===8?c.slice(0,4)+"-"+c.slice(4):""};
+
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s)})}
+async function initFirebase(){
+  if(!FB)return;
+  const V="10.12.2",base=`https://www.gstatic.com/firebasejs/${V}/`;
+  try{
+    await loadScript(base+"firebase-app-compat.js");
+    await Promise.all([loadScript(base+"firebase-auth-compat.js"),loadScript(base+"firebase-firestore-compat.js")]);
+    firebase.initializeApp(FB);
+    fs=firebase.firestore();
+    try{await fs.enablePersistence({synchronizeTabs:true})}catch(e){}
+    const cred=firebase.auth().currentUser||await new Promise(r=>{const u=firebase.auth().onAuthStateChanged(x=>{u();r(x)})})||(await firebase.auth().signInAnonymously()).user;
+    uid=cred.uid;
+    $("who").textContent=famCode?"متصل بالعيلة":"محفوظ على الموبايل";
+    if(famCode)attachFamily();
+  }catch(e){fs=null;$("who").textContent="بدون نت · محفوظ على الموبايل"}
+  if(view==="fam")renderFamily();
+}
+const myRef=()=>fs.collection("families").doc(famCode.replace("-","")).collection("members").doc(uid);
+function attachFamily(){
+  if(unsub)unsub();
+  let first=true;
+  unsub=fs.collection("families").doc(famCode.replace("-","")).collection("members").onSnapshot(snap=>{
+    family=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const mine=family.find(f=>f.id===uid);
+    if(first){
+      first=false;
+      if(mine&&mine.days){
+        const localOnly=Object.keys(state.days).some(k=>!mine.days[k]&&hasAny(state.days[k]));
+        state={nick:state.nick||mine.nick||"",days:{...state.days,...mine.days}};
+        saveLocal();$("nick").value=state.nick;
+        if(localOnly)flush();
+      }else flush();
+    }
+    if(view==="fam")renderFamily();
+  },()=>{$("joinStatus").textContent="تعذّر الاتصال بالعيلة.";});
+}
+let timer=null,writing=false,pending=false;
+function queueSync(now){
+  if(!fs||!uid||!famCode)return;
+  $("status").textContent="جاري المزامنة…";
+  clearTimeout(timer);timer=setTimeout(flush,now?0:700);
+}
+async function flush(){
+  if(!fs||!uid||!famCode)return;
+  if(writing){pending=true;return}
+  writing=true;
+  try{await myRef().set({nick:state.nick||"",days:state.days,updated:new Date().toISOString()});$("status").textContent="اتحفظ واتزامن ✓"}
+  catch(e){$("status").textContent="اتحفظ على الموبايل، وهيتزامن لما النت يرجع."}
+  writing=false;if(pending){pending=false;flush()}
+}
+
+function renderFamily(){
+  $("famOff").hidden=!!FB;
+  const joined=!!(FB&&famCode);
+  $("famJoin").hidden=!FB||joined;
+  $("famOn").hidden=!joined;$("famCodeCard").hidden=!joined;
+  if(!joined)return;
+  $("famCode").textContent=famCode;
+  const list=$("famList");
+  if(!fs){list.innerHTML=`<p class="sub">جاري الاتصال…</p>`;return}
+  if(!family.length){list.innerHTML=`<p class="sub">لسه محدش سجّل. ابعت الكود لأولادك.</p>`;$("famCount").textContent="";return}
+  const tk=key(today());
+  const last7=[...Array(7)].map((_,i)=>key(addDays(today(),-6+i)));
+  const items=family.map(f=>{
+    const days=f.days||{};
+    const logged=last7.filter(k=>hasAny(days[k]));
+    const avg=logged.length?Math.round(logged.reduce((a,k)=>a+score(days[k]),0)/logged.length):0;
+    return {nm:(f.nick||"").trim()||"بدون اسم",t:score(days[tk]),avg,days,me:f.id===uid};
+  }).sort((a,b)=>b.t-a.t);
+  list.innerHTML="";
+  items.forEach(it=>{
+    const el=document.createElement("div");el.className="member";
+    const av=document.createElement("div");av.className="av";av.textContent=it.nm.charAt(0);
+    const mid=document.createElement("div");
+    const n=document.createElement("div");n.className="m-n";n.textContent=it.nm+(it.me?" (إنت)":"");
+    const sub=document.createElement("div");sub.className="sub";sub.textContent=`متوسط آخر ٧ أيام: ${it.avg}`;
+    const sp=document.createElement("div");sp.className="spark";
+    last7.forEach(k=>{const i=document.createElement("i");const s=score(it.days[k]);
+      if(hasAny(it.days[k]))i.style.background=s>=90?"var(--l5)":s>=70?"var(--l4)":s>=40?"var(--l2)":"var(--l1)";sp.appendChild(i)});
+    mid.append(n,sub,sp);
+    const s=document.createElement("div");s.className="s";s.textContent=hasAny(it.days[tk])?it.t:"–";
+    el.append(av,mid,s);list.appendChild(el);
+  });
+  $("famCount").textContent=`${items.length} ${items.length>2&&items.length<11?"أفراد":"فرد"}`;
+}
+function needNick(){if(!state.nick){$("joinStatus").textContent="اكتب اسمك الأول واضغط حفظ.";$("nick").focus();return true}return false}
+$("createFam").onclick=()=>{
+  if(needNick())return;
+  if(!fs){$("joinStatus").textContent="محتاج نت علشان تعمل عيلة.";return}
+  famCode=newCode();setFam(famCode);attachFamily();renderFamily();$("who").textContent="متصل بالعيلة";
+};
+$("joinFam").onclick=()=>{
+  if(needNick())return;
+  const c=normCode($("joinCode").value);
+  if(!c){$("joinStatus").textContent="الكود ٨ حروف وأرقام، زي ABCD-2345.";return}
+  if(!fs){$("joinStatus").textContent="محتاج نت علشان تنضم.";return}
+  famCode=c;setFam(c);attachFamily();renderFamily();$("who").textContent="متصل بالعيلة";
+};
+$("shareCode").onclick=async()=>{
+  const text=`انضم لعيلتنا على تطبيق "محاسبة اليوم"\nالكود: ${famCode}\n${location.origin+location.pathname}`;
+  if(navigator.share){try{await navigator.share({text});return}catch(e){if(e.name==="AbortError")return}}
+  location.href="https://wa.me/?text="+encodeURIComponent(text);
+};
+$("leaveFam").onclick=()=>{$("leaveConfirm").hidden=false};
+$("leaveNo").onclick=()=>{$("leaveConfirm").hidden=true};
+$("leaveYes").onclick=async()=>{
+  try{await myRef().delete()}catch(e){}
+  if(unsub)unsub();unsub=null;family=[];famCode="";setFam("");
+  $("leaveConfirm").hidden=true;$("who").textContent="محفوظ على الموبايل";renderFamily();
+};
+$("saveNick").onclick=()=>{state.nick=$("nick").value.trim().slice(0,30);$("joinStatus").textContent="";changed(true);};
+
+/* ---------- tabs ---------- */
+let view="day";
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+  view=b.dataset.v;
+  document.querySelectorAll(".tabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  ["day","week","fam"].forEach(v=>$("v-"+v).hidden=v!==view);
+  renderView();window.scrollTo({top:0});
+});
+function renderView(){if(view==="day")renderDay();else if(view==="week")renderWeek();else renderFamily();}
+function changed(now){saveLocal();renderView();queueSync(now);}
+
+// refresh "today" when the app is reopened on a new day
+let startToday=today().getTime();
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden)return;
+  const t=today().getTime();
+  if(t!==startToday){if(cur.getTime()===startToday)cur=today();startToday=t;weekStart=startOfWeek(today());renderView();}
+});
+
+/* ---------- install ---------- */
+let deferred=null;
+const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;if(!standalone)$("installBar").hidden=false;});
+$("installBtn").onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice.catch(()=>{});deferred=null;$("installBar").hidden=true;};
+if(!standalone&&/iphone|ipad|ipod/i.test(navigator.userAgent)){
+  $("installText").textContent="للتثبيت: اضغط زر المشاركة ⬆︎ ثم \"إضافة إلى الشاشة الرئيسية\"";
+  $("installBtn").hidden=true;$("installBar").hidden=false;
+}
+if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+/* ---------- boot ---------- */
+loadLocal();$("nick").value=state.nick||"";renderDay();initFirebase();
+})();
+</script>
+</body>
+</html>

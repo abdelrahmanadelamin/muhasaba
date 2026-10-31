@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each family lives under families/{familyCode}. Only someone who knows the code can reach it,
+    // because listing all families is not allowed.
+    match /families/{family}/members/{member} {
+      // Any signed-in member of the app who knows the family code can see the family
+      allow read: if request.auth != null;
+      // Each person can only write or delete their own record
+      allow create, update: if request.auth != null
+                            && request.auth.uid == member
+                            && request.resource.data.keys().hasOnly(['nick', 'days', 'updated'])
+                            && request.resource.data.nick is string
+                            && request.resource.data.nick.size() <= 30
+                            && request.resource.data.days is map;
+      allow delete: if request.auth != null && request.auth.uid == member;
+    }
+    // Everything else is closed
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
